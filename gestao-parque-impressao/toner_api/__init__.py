@@ -1,0 +1,1 @@
+"""API corporativa de gestão de ativos de impressão e computadores."""

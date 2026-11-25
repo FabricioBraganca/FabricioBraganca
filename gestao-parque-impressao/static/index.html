@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a2d">
+  <title>Oficina — Gestão de assistência</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#inicio" aria-label="Oficina, início">
+        <span class="brand-mark">O</span>
+        <span><strong>oficina</strong><small>gestão de assistência</small></span>
+      </a>
+      <div class="nav-caption">ESPAÇO DE TRABALHO</div>
+      <nav class="navigation" aria-label="Navegação principal">
+        <button class="nav-link active" data-view="dashboard"><span>▦</span> Visão geral</button>
+        <button class="nav-link" data-view="orders"><span>▤</span> Ordens de serviço</button>
+        <button class="nav-link" data-view="stock"><span>◫</span> Estoque</button>
+        <button class="nav-link" data-view="assistant"><span>✳</span> Assistente</button>
+        <button class="nav-link" data-view="data"><span>⇅</span> Importar / exportar</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="status-dot"></span><span>Banco local ativo</span>
+        <small>Seus dados ficam nesta máquina.</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><p class="eyebrow" id="page-eyebrow">PAINEL DE CONTROLE</p><h1 id="page-title">Visão geral</h1></div>
+        <div class="topbar-right"><span class="local-badge"><span class="status-dot"></span> Ambiente local</span><span class="avatar">A</span></div>
+      </header>
+
+      <section class="view active" id="view-dashboard">
+        <div class="welcome-row"><div><h2>Bom trabalho começa com clareza.</h2><p>Acompanhe chamados e materiais da assistência em um só lugar.</p></div><button class="button primary" data-go="orders">＋ Abrir ordem de serviço</button></div>
+        <div class="metric-grid">
+          <article class="metric-card"><div class="metric-icon purple">▤</div><span class="metric-label">OS em aberto</span><strong id="metric-orders">—</strong><small>aguardando conclusão</small></article>
+          <article class="metric-card"><div class="metric-icon blue">◫</div><span class="metric-label">Unidades em estoque</span><strong id="metric-stock">—</strong><small>somatório dos toners</small></article>
+          <article class="metric-card"><div class="metric-icon green">↗</div><span class="metric-label">Consumo no mês</span><strong id="metric-usage">—</strong><small>unidades baixadas</small></article>
+          <article class="metric-card"><div class="metric-icon amber">＄</div><span class="metric-label">Valor do estoque</span><strong id="metric-value">—</strong><small>custo dos lotes restantes</small></article>
+        </div>
+        <div class="dashboard-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Atenção no estoque</h3><p>Itens no mínimo ou abaixo dele</p></div><button class="text-button" data-go="stock">Ver estoque →</button></div><div id="dashboard-low-stock" class="table-wrap"></div></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Ordens recentes</h3><p>Últimos chamados registrados</p></div><button class="text-button" data-go="orders">Ver todas →</button></div><div id="dashboard-orders" class="recent-list"></div></article>
+        </div>
+      </section>
+
+      <section class="view" id="view-orders">
+        <div class="section-intro"><div><h2>Ordens de serviço</h2><p>Registre solicitações locais e acompanhe o andamento de cada atendimento.</p></div></div>
+        <div class="panel form-panel"><div class="panel-heading"><div><h3>Abrir nova OS</h3><p>Preencha os dados recebidos do cliente.</p></div><span class="panel-step">NOVO CHAMADO</span></div>
+          <form id="order-form" class="form-grid">
+            <label>Cliente<select name="client_id" id="order-client" required><option value="">Selecione um cliente</option></select></label>
+            <label>Equipamento<input name="equipment" placeholder="Ex.: HP LaserJet Pro M404" required maxlength="200"></label>
+            <label>Prioridade<select name="priority"><option>Normal</option><option>Baixa</option><option>Alta</option><option>Urgente</option></select></label>
+            <label class="span-2">Problema relatado<textarea name="issue" placeholder="Descreva o defeito informado pelo cliente" required maxlength="2000" rows="3"></textarea></label>
+            <div class="form-actions span-2"><button class="button primary" type="submit">Criar ordem de serviço</button><span class="form-feedback" id="order-feedback"></span></div>
+          </form>
+          <details class="inline-create"><summary>＋ Cadastrar um novo cliente</summary><form id="client-form" class="inline-form"><input name="name" placeholder="Nome do cliente" required><input name="phone" placeholder="Telefone"><input name="email" type="email" placeholder="E-mail"><button class="button secondary" type="submit">Salvar cliente</button></form></details>
+        </div>
+        <article class="panel"><div class="panel-heading"><div><h3>Chamados registrados</h3><p>Atualize status, prioridade e solução diretamente na tabela.</p></div></div><div class="table-wrap"><table><thead><tr><th>OS / cliente</th><th>Equipamento / relato</th><th>Prioridade</th><th>Status</th><th>Solução</th><th></th></tr></thead><tbody id="orders-table"></tbody></table></div></article>
+      </section>
+
+      <section class="view" id="view-stock">
+        <div class="section-intro"><div><h2>Estoque de toners</h2><p>Entradas criam lotes; as baixas consomem automaticamente os mais antigos primeiro (FIFO).</p></div></div>
+        <div class="stock-actions">
+          <article class="panel"><div class="panel-heading"><div><h3>Cadastrar toner</h3><p>Crie o item antes de registrar entradas.</p></div></div><form id="toner-form" class="stack-form"><label>Código / SKU<input name="sku" required maxlength="80" placeholder="Ex.: TN-1060"></label><label>Nome do toner<input name="name" required placeholder="Ex.: Toner preto Brother"></label><label>Estoque mínimo<input name="min_stock" type="number" min="0" value="2" required></label><button class="button primary" type="submit">Cadastrar item</button><span class="form-feedback" id="toner-feedback"></span></form></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Registrar entrada</h3><p>Informe quantidade, custo e data do lote.</p></div></div><form id="receipt-form" class="stack-form"><label>Toner<select name="toner_id" class="toner-select" required><option value="">Selecione um toner</option></select></label><div class="two-fields"><label>Quantidade<input name="quantity" type="number" min="1" required></label><label>Custo unitário<input name="cost_per_unit" type="number" min="0" step="0.01" value="0" required></label></div><label>Data de entrada<input name="received_at" type="date"></label><button class="button primary" type="submit">＋ Registrar lote</button><span class="form-feedback" id="receipt-feedback"></span></form></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Dar baixa</h3><p>O sistema fará a saída por ordem de entrada.</p></div></div><form id="consume-form" class="stack-form"><label>Toner<select name="toner_id" class="toner-select" required><option value="">Selecione um toner</option></select></label><div class="two-fields"><label>Quantidade<input name="quantity" type="number" min="1" required></label><label>Vincular à OS<select name="work_order_id" id="consume-order"><option value="">Sem OS vinculada</option></select></label></div><button class="button dark" type="submit">− Confirmar baixa FIFO</button><span class="form-feedback" id="consume-feedback"></span></form></article>
+        </div>
+        <article class="panel"><div class="panel-heading"><div><h3>Posição atual</h3><p>Saldo disponível e nível mínimo por item.</p></div><a class="text-button" href="/api/export/stock">Exportar CSV →</a></div><div class="table-wrap"><table><thead><tr><th>Código</th><th>Toner</th><th>Disponível</th><th>Mínimo</th><th>Valor em estoque</th><th>Situação</th></tr></thead><tbody id="stock-table"></tbody></table></div></article>
+      </section>
+
+      <section class="view" id="view-assistant">
+        <div class="section-intro"><div><h2>Assistente de operações</h2><p>Faça perguntas sobre os dados atuais de OS e estoque.</p></div></div>
+        <div class="assistant-layout"><article class="assistant-card"><div class="assistant-orb">✳</div><span class="panel-step">ASSISTENTE LOCAL</span><h2>Como posso ajudar?</h2><p>Consulte ordens em aberto ou descubra quais toners precisam de reposição.</p><form id="assistant-form"><label class="sr-only" for="assistant-question">Sua pergunta</label><textarea id="assistant-question" name="question" rows="3" required placeholder="Ex.: Quais OS estão abertas?"></textarea><div class="assistant-footer"><span>As respostas usam apenas os dados locais cadastrados.</span><button class="button primary" type="submit">Perguntar <span>→</span></button></div></form></article>
+          <aside class="assistant-side"><h3>Perguntas sugeridas</h3><button class="suggestion" data-question="Quais OS estão abertas?">Quais OS estão abertas? <span>↗</span></button><button class="suggestion" data-question="Qual toner preciso repor?">Qual toner preciso repor? <span>↗</span></button><div class="notice"><strong>Sobre o assistente</strong><p>Esta versão consulta seus dados localmente e não altera OS nem estoque. Um provedor de IA externo pode ser conectado futuramente.</p></div></aside></div>
+        <article class="panel answer-panel" id="assistant-answer-panel" hidden><div class="panel-heading"><div><h3>Resposta</h3><p>Consulta ao banco de dados local</p></div></div><p id="assistant-answer" class="answer-text"></p><div id="assistant-details"></div></article>
+      </section>
+
+      <section class="view" id="view-data">
+        <div class="section-intro"><div><h2>Importar e exportar</h2><p>Transfira cadastros e relatórios por arquivos CSV.</p></div></div>
+        <div class="data-grid"><article class="panel"><div class="panel-heading"><div><h3>Importar cadastros</h3><p>Clientes ou catálogo de toners, com validação antes de gravar.</p></div></div><form id="import-form" class="stack-form"><label>Tipo de cadastro<select name="resource"><option value="clients">Clientes</option><option value="toners">Toners</option></select></label><label>Arquivo CSV<input name="file" type="file" accept=".csv,text/csv" required></label><div class="notice compact"><p>Clientes: <code>name,phone,email</code>. Toners: <code>sku,name,min_stock</code>. Limite: 5.000 linhas.</p></div><button class="button primary" type="submit">Importar CSV</button><span class="form-feedback" id="import-feedback"></span></form></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Exportar dados</h3><p>Baixe relatórios para abrir em planilhas.</p></div></div><div class="export-list"><a href="/api/export/clients"><span class="file-icon">CSV</span><span><strong>Clientes</strong><small>Cadastro e contatos</small></span><b>↓</b></a><a href="/api/export/toners"><span class="file-icon">CSV</span><span><strong>Catálogo de toners</strong><small>Itens e estoque mínimo</small></span><b>↓</b></a><a href="/api/export/stock"><span class="file-icon">CSV</span><span><strong>Posição do estoque</strong><small>Saldo atual por toner</small></span><b>↓</b></a><a href="/api/export/work-orders"><span class="file-icon">CSV</span><span><strong>Ordens de serviço</strong><small>Chamados e status</small></span><b>↓</b></a></div></article></div>
+        <div class="notice security-note"><strong>Privacidade e acesso</strong><p>O aplicativo inicia vinculado ao computador local por padrão. O MVP ainda não possui login; não o exponha à internet nem a uma rede compartilhada sem adicionar autenticação e controles de acesso.</p></div>
+      </section>
+      <footer class="footer">Oficina <span>•</span> Sistema local de gestão de assistência</footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
